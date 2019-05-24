@@ -1,0 +1,58 @@
+
+typedef struct tObj{                  //Objektmall
+	int height;
+	int width;
+	int posx, posy;
+	int velx, vely;
+	int accx, accy;
+	char* sprite[MAX_POINTS];
+	void (*draw) (struct tObj *);
+	void (*jump) (struct tObj *);
+}OBJECT, *POBJECT;
+
+static OBJECT Pedro = 
+{
+	32, 20,				//height, width
+	0,32,				//initial startposition
+	0,0,				//Hastighet
+	0,0,				//Acceleration
+	pedro_still,		//Sprite
+	draw,
+	jump
+};
+
+#define MAX_VELX 4
+#define ACCX 1
+
+void move(POBJECT Pedro){								//Kollar knapptryck och uppdaterar alla Pedros värden
+	if(isRightKey() && !isLeftKey()){     //Kräver importerad keyb
+		if(Pedro->velx < MAX_VELX){
+			Pedro->accx = ACCX;
+		}
+		else{
+			Pedro->accx = 0;
+		}
+		Pedro->velx += Pedro->accx;
+	}
+	else if(!isRightKey() && isLeftKey())
+	{
+		if(Pedro->velx > -MAX_VELX){
+			Pedro->accx = -ACCX;
+		}
+		else{
+			Pedro->accx = 0;
+		}
+		Pedro->velx += Pedro->accx;
+	}
+	else
+	{
+		Pedro->accx = 0;
+		if(Pedro->velx > 0){
+			Pedro->velx -= ACCX;
+		}
+		if(Pedro->velx < 0){
+			Pedro->velx += ACCX;
+		}
+	}
+	Pedro->posx += Pedro->velx;
+}
