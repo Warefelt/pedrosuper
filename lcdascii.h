@@ -27,8 +27,6 @@ void clear_backBuffer();
 void pixel(int x, int y, int set);
 void byteToBuffer(int addr, int page, char c);
 void graphic_draw_screen(void);
-;
-
 
 
 
