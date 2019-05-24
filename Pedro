@@ -56,3 +56,13 @@ void move(POBJECT Pedro){								//Kollar knapptryck och uppdaterar alla Pedros 
 	}
 	Pedro->posx += Pedro->velx;
 }
+
+int objtouchesborder(POBJECT o){
+    if((o->posx < 1) || (o->posx + o->width) > 128 ){
+        return 1;
+    }
+    else if((o->posy < 1) || (o->posy + o->height) > 64){
+        return 2;
+    }
+    return 0;
+}
