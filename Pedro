@@ -57,6 +57,19 @@ void move(POBJECT Pedro){								//Kollar knapptryck och uppdaterar alla Pedros 
 	Pedro->posx += Pedro->velx;
 }
 
+void draw(POBJECT object){		//Ritar ut pedro enligt hans position och utseende. Dessa står fria att ändras i andra metoder
+	 unsigned char i, j;
+	 unsigned char* man = object->sprite;
+        for(j = 0; j < (object->height)/8; j++) {
+            graphic_write_command(LCD_SET_PAGE | (((63-object->posy-object->height)/8)+j), B_CS1);
+            graphic_write_command(LCD_SET_ADD | object->posx, B_CS1);
+            for(i = 0; i < object->width; i++) {
+				unsigned char byte = *(man+(j*object->width)+i);
+                graphic_write_data(byte, B_CS1);
+            }
+        }
+}
+
 int objtouchesborder(POBJECT o){
     if((o->posx < 1) || (o->posx + o->width) > 128 ){
         return 1;
