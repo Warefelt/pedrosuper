@@ -43,7 +43,7 @@ typedef struct {
 } GPIO;
 
 
-uint8_t backBuffer[1152]; // 144 * 64 / 8
+uint8_t backBuffer[256][8]; // 256 * 64 / 8
 
 
 void startup(void) __attribute__((naked)) __attribute__((section (".start_section")) );
@@ -78,15 +78,13 @@ void app_init(){
     
     GPIO_D->moder = 0x55005555;
     
-     //Sätt pinnar 7-0 till "push-pull"
 	GPIO_D->otyper &= 0xFFFF00FF;
 	GPIO_D->otyper |= 0x00000F00;
 	// Sätter pinnar 4-0 till "pull-down"
 	GPIO_D->pupdr &= 0x0000FFFF;
 	GPIO_D->pupdr |= 0xFFAA0000;
+
 }
-
-
 
 //helper funcs
 static void graphic_ctrl_bit_set(uint8_t x);        //set R/W, En, RESET, etc.
@@ -251,38 +249,29 @@ void graphic_clear_screen(void){
 
 
 void clear_backBuffer() {
-    for (int i = 0; i < sizeof(backBuffer); i++){
-			 backBuffer[i] = 0;
+    for (int i = 0; i < 256; i++){
+        for(int j = 0; j < 8; j++)
+			 backBuffer[i][j] = 0;
 	}
 }
 
 void pixel(int x, int y, int set) {
-    uint8_t mask;
-    int index = 0;
-    if((x < 1) || (y < 1) || (x > 128) || (y > 64)) return;
-    index = (y-1)/8;
     
-    mask = 1 << ((y-1)%8);
-    
-    if(x > 64){
-        x -= 65;
-        index = 64;
-    } else {
-        x = x-1;
-    }
-    
-    index += x;
+    uint8_t mask = 1 << ((y-1)%8);
     
     if(set){
-        backBuffer[(x-1)/8 + 8*(y-1)] |= mask;
+        backBuffer[64+(y-1)][(x-1)/8] |= mask;
     }
     else{
-        backBuffer[(x-1)/8 + 8*(y-1)] &= ~mask;
+        backBuffer[64+(y-1)][(x-1)/8] &= ~mask;
     }
 }
 
 void byteToBuffer(int addr, int page, char c){
-	backBuffer[page + addr*8] = c;
+	backBuffer[addr][page] = c;
+}
+void byteToScreenBuffer(int addr, int page, char c){
+	backBuffer[64+addr][page] = c;
 }
 
 void graphic_draw_screen(void) {
@@ -294,7 +283,7 @@ void graphic_draw_screen(void) {
             graphic_write_command(LCD_SET_PAGE | j, controller);
             graphic_write_command(LCD_SET_ADD | 0, controller);
             for(i = 0; i <= 63; i++, k++) {
-                graphic_write_data(backBuffer[c*512 + i*8 + j], controller);
+                graphic_write_data(backBuffer[64+c*64 + i][j], controller);
             }
         }
     }
@@ -678,18 +667,30 @@ int main3(int argc, char **argv)
     }
 }
 
-void bufferShift(){
-	for(int i = 0; i < 143; i++){
+
+void shiftRight(){
+	for(int i = 255; i > 0; i--){
 		for(int j = 0; j < 8; j++){
-			backBuffer[j + i*8] = backBuffer[j + (i+1)*8];
+			backBuffer[i][j] = backBuffer[i-1][j];
 		}
 	}	
     for(int j = 0; j < 8; j++){
-        backBuffer[1151 - j] = 0; 
+        backBuffer[0][j] = 0; 
+    }
+}
+void shiftLeft(){
+	for(int i = 0; i < 255; i++){
+		for(int j = 0; j < 8; j++){
+			backBuffer[i][j] = backBuffer[i+1][j];
+		}
+	}	
+    for(int j = 0; j < 8; j++){
+        backBuffer[255][j] = 0; 
     }
 }
 
-void loadPepper(){
+//addr/page is the rightmost lower corner
+void loadPepperAt(int addr, int page){
 		char b[][2]= 
 				{
 				{0b00011111,0b11110000},
@@ -711,37 +712,38 @@ void loadPepper(){
 				};
 		for(int j = 1; j >= 0; j--){
 			for(int i = 15; i >= 0; i--){
-				byteToBuffer(143 - i, 7 - j, b[i][j]);
+				byteToBuffer(addr - i, page - j, b[i][j]);
 			}
 		}
 }
 
 char isUpKey(){
+    char c = 0;
 	kbdActivate(3);	//row3
 	kbdActivate(4);         //power off kbd-rows
 	if(kbdGetCol() == 3){
-		kbdActivate(0);         //power off kbd-rows
-		return 1;
+		c = 1;
 	}
-	return 0;
+	kbdActivate(0);         //power off kbd-rows
+    return c;
 }
 char isRightKey(){
+    char c = 0;
 	kbdActivate(4);
 	if(kbdGetCol() == 4){
-		kbdActivate(0);         //power off kbd-rows
-		return 1;
+		c = 1;
 	}
-return 0;
-	
+	kbdActivate(0);         //power off kbd-rows
+    return c;
 }
 char isLeftKey(){
+    char c = 0;
 	kbdActivate(4);
 	if(kbdGetCol() == 2){
-		kbdActivate(0);         //power off kbd-rows
-		return 1;
+		c = 1;
 	}
-	return 0;
-	
+	kbdActivate(0);         //power off kbd-rows
+    return c;	
 }
 
 int main4(){
@@ -754,65 +756,85 @@ int main4(){
 	clear_backBuffer();
 	
 	graphic_draw_screen();
-				delaymillis(5000); 		//kan tas bort
+				//delaymillis(5000); 		//kan tas bort
 				
 	
 
 	while(1){
-		loadPepper();
+		loadPepperAt(103, 7);
 		for(int i = 0; i < 32; i++){
 		
-			bufferShift();
-			graphic_draw_screen();
+            if(isLeftKey())
+                shiftRight();
+            if(isRightKey())
+                shiftLeft();
+             graphic_draw_screen();
 		}
 		
 	}
 	
+
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+}
+
+
+#define ACCX 1
+#define MAX_VELX 4
+int velx, accx, posx;
+
+void move(){								//Kollar knapptryck och uppdaterar alla Pedros värden
+    
+    checkKeys();
+
+    applyPhysics();
+    
+    if(velx > 0){
+        shiftLeft();
+        delaymillis(20/velx);
+    }
+    else if(velx < 0){
+        shiftRight();
+        delaymillis(20/(-velx));
+    }
+    graphic_draw_screen();
+
+}
+
+//check keypresses and change pedros properties (acceleration for <- ^ -> and velocity for ^) accordingly
+void checkKeys()){
+    if(isRightKey() && !isLeftKey()){     //Kräver importerad keyb
+		if(velx < MAX_VELX){
+			accx = ACCX;     //accelerate right
+		}
+		else{
+			accx = 0;
+		}
+	}
+	else if(!isRightKey() && isLeftKey())
+	{
+		if(velx > -MAX_VELX){
+			accx = -ACCX;    //accelerate left
+		}
+		else{
+			accx = 0;
+		}
+	}
+	else                            //decrease velocity
+	{
+		accx = 0;
+		if(velx > 0){
+			velx -= ACCX;
+		}
+		if(velx < 0){
+			velx += ACCX;
+		}
+	}
+    
+}
+
+void applyPhysics(){
+    //physics
+    velx += accx;
+	posx += velx;
+    
 }
