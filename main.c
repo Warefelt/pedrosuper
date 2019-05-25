@@ -1,7 +1,32 @@
 /*
  * 	startup.c
  *
- */
+ 
+
+
+#####TODO#####
+-ändra backbuffer till 64 bytes på båda sidor backbuffer[1280]
+
+-rightshift()
+-fixa paprikorna? s.a ej upponer
+-includes
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+
+
+
  #include ""
 void startup(void) __attribute__((naked)) __attribute__((section (".start_section")) );
 
@@ -17,8 +42,6 @@ __asm volatile(
 
 
 //GLOBALS
-short jumppressed;
-
 
 //keyboard interrupts
 void irq_right(){
@@ -83,7 +106,9 @@ void move(){
      * ändra P:s properties (physics())
      * 
      * << backbuffer 
-     * sprites -> backbuffer
+     * sprites -> backbuffer (sprites 1px bredare än nödvändigt på var sida gör att vi inte behöver clear:a Pedro)
+      		* kolla nedre hörnen först, om pixeln är 1 -> Pedro.touches = 1 innan 	
+	
     */
     
 }
@@ -92,13 +117,17 @@ void move(){
 void update(){
 	//
 	//ändra Pedros properties
-
+	if(backBuffer[] == 0){
+		loadNewLevelSegment()
+	}
+	
 	if(jumppressed){
-		if(Pedro.canjump(Pedro)){
+		if(!Pedro.isJumping(Pedro)){
 			Pedro.jump(Pedro);
 		}
 	}
-	Pedro.move(Pedro);
+	if(
+	Pedro.move(Pedro);	//flyttar hela skärmen så det ser ut som att Pedro rör sig
 	
 	//win/loss
 	if(Pedro.touches == 1){
@@ -108,13 +137,6 @@ void update(){
 		onWin();
 	}*/
 	
-
-	//skriv ny skärm till buffern
-	updateBuffer();
-	
-	
-	//måla buffern
-	drawBuffer();
 }
 
 
