@@ -1,4 +1,5 @@
 #include "pedro.h"
+#include "LcdAscii.h"
 
 
 #define MAX_POINTS 100
@@ -24,78 +25,78 @@ static OBJECT Pedro =
 };
 
 
-void move(POBJECT Pedro){								//Kollar knapptryck och uppdaterar alla Pedros värden
+void move(){								//Kollar knapptryck och uppdaterar alla Pedros värden
     
-    checkKeys(Pedro);
+    checkKeys();
 
-    applyPhysics(Pedro);
+    applyPhysics();
     
-    if(Pedro->velx > 0){
+    if(Pedro.velx > 0){
         shiftLeft();
     }
-    else if(Pedro->velx < 0){
+    else if(Pedro.velx < 0){
         shiftRight();
     }
     graphic_draw_screen();
-    Pedro->draw(Pedro);  //extra args? FLYTTA? han kan ritas ut med resten av skärmen_________________________________________________________________________________* 
+    draw(&Pedro);  //extra args? FLYTTA? han kan ritas ut med resten av skärmen_________________________________________________________________________________* 
 
 }
 
 //check keypresses and change pedros properties (acceleration for <- ^ -> and velocity for ^) accordingly
-void checkKeys(POBJECT Pedro){
+void checkKeys(){
     if(isRightKey() && !isLeftKey()){     //Kräver importerad keyb
-		if(Pedro->velx < MAX_VELX){
-			Pedro->accx = ACCX;     //accelerate right
+		if(Pedro.velx < MAX_VELX){
+			Pedro.accx = ACCX;     //accelerate right
 		}
 		else{
-			Pedro->accx = 0;
+			Pedro.accx = 0;
 		}
 	}
 	else if(!isRightKey() && isLeftKey())
 	{
-		if(Pedro->velx > -MAX_VELX){
-			Pedro->accx = -ACCX;    //accelerate left
+		if(Pedro.velx > -MAX_VELX){
+			Pedro.accx = -ACCX;    //accelerate left
 		}
 		else{
-			Pedro->accx = 0;
+			Pedro.accx = 0;
 		}
 	}
 	else                            //decrease velocity
 	{
-		Pedro->accx = 0;
-		if(Pedro->velx > 0){
-			Pedro->velx -= ACCX;
+		Pedro.accx = 0;
+		if(Pedro.velx > 0){
+			Pedro.velx -= ACCX;
 		}
-		if(Pedro->velx < 0){
-			Pedro->velx += ACCX;
+		if(Pedro.velx < 0){
+			Pedro.velx += ACCX;
 		}
 	}
     
-    if(Pedro->isJumping(Pedro)){
-        Pedro->accy = 1;
+    if(isJumping()){
+        Pedro.accy = 1;
     }
     else {  //Pedro on ground
-        Pedro->accy = 0;
+        Pedro.accy = 0;
         if(isUpKey()){
-			Pedro->vely = VELY;    //jump
-            Pedro->accy = 1;
+			Pedro.vely = VELY;    //jump
+            Pedro.accy = 1;
 		}
 	}
     
 }
 
-void applyPhysics(POBJECT Pedro){
+void applyPhysics(){
     //physics
-    Pedro->velx += Pedro->accx;
-	Pedro->posx += Pedro->velx;
+    Pedro.velx += Pedro.accx;
+	Pedro.posx += Pedro.velx;
     
-    Pedro->vely += Pedro->accy;
-	Pedro->posy += Pedro->vely;
+    Pedro.vely += Pedro.accy;
+	Pedro.posy += Pedro.vely;
     
 }
 
-void isJumping(POBJECT Pedro){
-    return Pedro->posy < .....//groundlvl+pedroheight
+char isJumping(){
+    //return Pedro.posy < .....//groundlvl+pedroheight
 }
 
 
@@ -113,8 +114,8 @@ void draw(POBJECT object){		//Ritar ut pedro enligt hans position och utseende. 
         }
 }
 
-int touchesPepper(POBJECT Pedro){
-    //kolla nedre hörnen (om Pedro bredare än 16px även i mitten) först, om pixeln är 1 -> Pedro->touches = 1 innan
+char touchesPepper(){
+    //kolla nedre hörnen (om Pedro bredare än 16px även i mitten) först, om pixeln är 1 -> Pedro.touches = 1 innan
     //jfr pedrobyte & backbufferbyte
 }
 /*

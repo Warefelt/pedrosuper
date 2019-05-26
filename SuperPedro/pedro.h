@@ -18,13 +18,13 @@ typedef struct tObj{                  //Objektmall
 	void (*jump) (struct tObj *);
 }OBJECT, *POBJECT;
 
-void move(POBJECT Pedro);
+void move();
 
 //check keypresses and change pedros properties (acceleration for <- ^ -> and velocity for ^) accordingly
-void checkKeys(POBJECT Pedro);
-void applyPhysics(POBJECT Pedro);
-void isJumping(POBJECT Pedro);
-void draw(POBJECT object);
-int touchesPepper(POBJECT Pedro);
+void checkKeys();
+void applyPhysics();
+char isJumping();
+void draw();
+char touchesPepper();
 
 #endif //PEDRO_H

@@ -130,20 +130,20 @@ monitor restart</PostConnectCommands>
     </Configuration>
   </Settings>
   <VirtualDirectory Name="src">
-    <File Name="pedro.h"/>
-    <File Name="gpio.h"/>
-    <File Name="README.md"/>
     <File Name="Pedro.c" ExcludeProjConfig=""/>
     <File Name="main.c" ExcludeProjConfig=""/>
-    <File Name="lcdascii.h" ExcludeProjConfig=""/>
     <File Name="LcdAscii.c" ExcludeProjConfig=""/>
     <File Name="latest_working_build.c" ExcludeProjConfig="Debug;"/>
-    <File Name="keyfuncs.h" ExcludeProjConfig=""/>
     <File Name="keyFuncs.c" ExcludeProjConfig=""/>
-    <File Name="delays.h" ExcludeProjConfig=""/>
     <File Name="delays.c" ExcludeProjConfig=""/>
   </VirtualDirectory>
   <VirtualDirectory Name="resources">
+    <File Name="README.md"/>
+    <File Name="pedro.h"/>
+    <File Name="lcdascii.h"/>
+    <File Name="keyfuncs.h"/>
+    <File Name="gpio.h"/>
+    <File Name="delays.h"/>
     <File Name="md407-ram.x"/>
   </VirtualDirectory>
 </CodeLite_Project>

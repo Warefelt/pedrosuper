@@ -1,27 +1,9 @@
-// Define values specifying particular bits in
-// the control register.
-#define B_E 0x40
-#define B_RST 0x20
-#define B_CS2 0x10
-#define B_CS1 0x08 
-#define B_SELECT 0x04
-#define B_RW 0x02
-#define B_RS 0x01
-
-// Define values specifying particular bits for
-// LCD.
-#define LCD_ON 0x3F // Display on
-#define LCD_OFF 0x3E // Display off
-#define LCD_SET_ADD 0x40 // Set horizontal coordinate
-#define LCD_SET_PAGE 0xB8 // Set vertical coordinate
-#define LCD_DISP_START 0xC0 // Start address
-#define LCD_BUSY 0x80 // Read busy status
-
-//backbuffer, screen is updated with graphic_draw_screen
-uint8_t backBuffer[1152]; // 144 * 64 / 8
+#include "LcdAscii.h"
+#include "gpio.h"
 
 
 
+uint8_t backBuffer[256][8]; // 256 * 64 / 8
 
 
 void graphic_ctrl_bit_set(unsigned char x){
@@ -122,7 +104,7 @@ static uint8_t graphic_read_data(uint8_t controller) {
     return graphic_read(controller);
 }
 
-static void graphic_write(uint8_t value, uint8_t controller){
+void graphic_write(uint8_t value, uint8_t controller){
     GPIO_E->odrHigh = value;
     delay_500ns();
     graphic_ctrl_bit_set(B_E);
@@ -143,13 +125,13 @@ static void graphic_write(uint8_t value, uint8_t controller){
     select_controller(0);    
     
 }
-static void graphic_write_command(uint8_t command, uint8_t controller){
+void graphic_write_command(uint8_t command, uint8_t controller){
     graphic_ctrl_bit_clear(B_E);
     select_controller(controller);
     graphic_ctrl_bit_clear(B_RS | B_RW);
     graphic_write(command, controller);
 }
-static void graphic_write_data(uint8_t data, uint8_t controller){
+void graphic_write_data(uint8_t data, uint8_t controller){
     graphic_ctrl_bit_clear(B_E);
     select_controller(controller);
     graphic_ctrl_bit_clear(B_RW);
@@ -166,38 +148,29 @@ void graphic_clear_screen(void){
 
 
 void clear_backBuffer() {
-    for (int i = 0; i < sizeof(backBuffer); i++){
-			 backBuffer[i] = 0;
+    for (int i = 0; i < 256; i++){
+        for(int j = 0; j < 8; j++)
+			 backBuffer[i][j] = 0;
 	}
 }
 
 void pixel(int x, int y, int set) {
-    uint8_t mask;
-    int index = 0;
-    if((x < 1) || (y < 1) || (x > 128) || (y > 64)) return;
-    index = (y-1)/8;
     
-    mask = 1 << ((y-1)%8);
-    
-    if(x > 64){
-        x -= 65;
-        index = 64;
-    } else {
-        x = x-1;
-    }
-    
-    index += x;
+    uint8_t mask = 1 << ((y-1)%8);
     
     if(set){
-        backBuffer[(x-1)/8 + 8*(y-1)] |= mask;
+        backBuffer[64+(y-1)][(x-1)/8] |= mask;
     }
     else{
-        backBuffer[(x-1)/8 + 8*(y-1)] &= ~mask;
+        backBuffer[64+(y-1)][(x-1)/8] &= ~mask;
     }
 }
 
 void byteToBuffer(int addr, int page, char c){
-	backBuffer[page + addr*8] = c;
+	backBuffer[addr][page] = c;
+}
+void byteToScreenBuffer(int addr, int page, char c){
+	backBuffer[64+addr][page] = c;
 }
 
 void graphic_draw_screen(void) {
@@ -209,7 +182,7 @@ void graphic_draw_screen(void) {
             graphic_write_command(LCD_SET_PAGE | j, controller);
             graphic_write_command(LCD_SET_ADD | 0, controller);
             for(i = 0; i <= 63; i++, k++) {
-                graphic_write_data(backBuffer[c*512 + i*8 + j], controller);
+                graphic_write_data(backBuffer[64+c*64 + i][j], controller);
             }
         }
     }
@@ -246,3 +219,25 @@ void pixel(int x, int y, int set) {
 
 
 */
+
+
+void shiftRight(){
+	for(int i = 255; i > 0; i--){
+		for(int j = 0; j < 8; j++){
+			backBuffer[i][j] = backBuffer[i-1][j];
+		}
+	}	
+    for(int j = 0; j < 8; j++){
+        backBuffer[0][j] = 0; 
+    }
+}
+void shiftLeft(){
+	for(int i = 0; i < 255; i++){
+		for(int j = 0; j < 8; j++){
+			backBuffer[i][j] = backBuffer[i+1][j];
+		}
+	}	
+    for(int j = 0; j < 8; j++){
+        backBuffer[255][j] = 0; 
+    }
+}
