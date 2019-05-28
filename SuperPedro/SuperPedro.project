@@ -130,12 +130,12 @@ monitor restart</PostConnectCommands>
     </Configuration>
   </Settings>
   <VirtualDirectory Name="src">
-    <File Name="Pedro.c" ExcludeProjConfig=""/>
-    <File Name="main.c" ExcludeProjConfig=""/>
-    <File Name="LcdAscii.c" ExcludeProjConfig=""/>
-    <File Name="latest_working_build.c" ExcludeProjConfig="Debug;"/>
-    <File Name="keyFuncs.c" ExcludeProjConfig=""/>
-    <File Name="delays.c" ExcludeProjConfig=""/>
+    <File Name="Pedro.c" ExcludeProjConfig="Debug;"/>
+    <File Name="main.c" ExcludeProjConfig="Debug;"/>
+    <File Name="LcdAscii.c" ExcludeProjConfig="Debug;"/>
+    <File Name="latest_working_build.c" ExcludeProjConfig=""/>
+    <File Name="keyFuncs.c" ExcludeProjConfig="Debug;"/>
+    <File Name="delays.c" ExcludeProjConfig="Debug;"/>
   </VirtualDirectory>
   <VirtualDirectory Name="resources">
     <File Name="README.md"/>

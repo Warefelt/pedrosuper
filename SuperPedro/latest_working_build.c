@@ -3,6 +3,8 @@
  *
  */
 #include <stdint.h>
+#include <time.h>
+
 
 #define GPIO_D ((volatile GPIO*) 0x40020c00)
 #define GPIO_E ((volatile GPIO*) 0x40021000)
@@ -65,7 +67,8 @@ void app_init(){
 	#ifdef USBDM
 		*((unsigned long*)0x40023830)=0x18;
 	 #endif
-    
+        srand(time(NULL));   // Initialization, should only be called once.
+
     GPIO_E->moder=0x55555555;		//------------------------------------------------------------------------------------------------
     /*
     // Sätt pinnar 7-0 till "push-pull"
@@ -689,33 +692,6 @@ void shiftLeft(){
     }
 }
 
-//addr/page is the rightmost lower corner
-void loadPepperAt(int addr, int page){
-		char b[][2]= 
-				{
-				{0b00011111,0b11110000},
-				{0b00110000,0b00111000},
-				{0b00100000,0b00001100},
-				{0b00110000,0b00000111},
-				{0b00010000,0b00000001},
-				{0b00111000,0b00011111},
-				{0b01100111,0b11100110},
-				{0b11100000,0b00000100},
-				{0b11110000,0b00000100},
-				{0b11010000,0b00000110},
-				{0b10011100,0b00000011},
-				{0b10110011,0b11111101},
-				{0b00100000,0b00000011},
-				{0b00100000,0b00000110},
-				{0b00110000,0b00001100},
-				{0b00011111,0b11111000}
-				};
-		for(int j = 1; j >= 0; j--){
-			for(int i = 15; i >= 0; i--){
-				byteToBuffer(addr - i, page - j, b[i][j]);
-			}
-		}
-}
 
 char isUpKey(){
     char c = 0;
@@ -759,19 +735,134 @@ int main4(){
 				//delaymillis(5000); 		//kan tas bort
 				
 	
-
+ drawGround(0, 127);
+	
 	while(1){
-		loadPepperAt(103, 7);
-		for(int i = 0; i < 32; i++){
-		
-            moveScreen();
+		//
+		//ändra Pedros properties
+		delaymillis(100);
+		if(backBuffer[63][7] == 0){
+			loadNewLevelSegmentLeft()
+		}
+		if(backBuffer[192][7] == 0){
+			loadNewLevelSegmentRight()
 		}
 		
+		move();			//flyttar hela skärmen så det ser ut som att Pedro rör sig
+			
+		//win/loss
+		if(touchesPepper() == 1){
+			break;		//startar om spelet från början
+		}
+		/*if(Pedro.distance == ){
+			onWin();
+		}*/
 	}
 	
-
+}
+void loop(){
+	//(splash start)	
+	//
+	//	
+   
 	
 }
+
+
+void update(){
+
+}
+
+
+void loadNewLevelSegmentLeft(){
+    loadLvl(0);  //64px wide
+}
+
+void loadNewLevelSegmentRight(){
+    loadLvl(192);
+}
+
+void loadLvl(int start){        //loads a 64px wide levelstrip of new peppers into the backBuffer (starting at start, moving right)
+	
+	int type = rand() % 20;      // Returns a pseudo-random integer between 0 and 10, några olika varianter 1=____, 2=_oo_, 3=_8__, 4=_o_o mm.
+char* PepperStrips[20]{ "____", "_oo_", "_8__", "_o_o", "o__o", "_o__", "__8_", "_o8_", "__o_", "____", "____", "o___", "___o", "o_o_", "_8o_","_o__","__o_","o___", "___o","____"}
+	
+	
+	for(int i = 0; i < 64, i+=16){
+		loadPepperStrip(start + i, type[i]);
+	}
+	drawGround(start, start+64);
+    
+}
+//bör fungera
+void loadPepperStrip(int start, char* type){
+	
+	switch(type){
+		case '_': 
+			break;
+		case 'o': 
+			loadPepperAt(start, 6);
+			break;
+		case '8':
+			loadPepperAt(start, 6);
+			loadPepperAt(start, 4);
+			break;
+			
+	}
+}
+
+
+void drawGround(int from, int to){
+    char c = 0b00011000;
+    for(from; from <= to; from++){
+        backBuffer[64+from][7] |= c;
+    }
+}
+
+
+
+void onWin(){
+	//ska vi ha med denna?
+
+}
+
+//bör fungera
+void loadPepperAt(int addr, int page){
+		char b[][2]= 
+				{
+				{0b11111000, 0b00000111}, 
+				{0b00001100, 0b00011100}, 
+				{0b00000100, 0b00110000},
+				{0b00001100, 0b11100000},
+				{0b11101000, 0b10000111},
+				{0b00011100, 0b11011000},
+				{0b00000110, 0b01100000}, 
+				{0b00000111, 0b00100000},
+				{0b00001111, 0b00100000},
+				{0b00001011, 0b01100000},
+				{0b00111001, 0b11010000}, 
+				{0b11001101, 0b10001111},
+				{0b00000100, 0b11000000}, 
+				{0b00000100, 0b01100000},
+				{0b00001100, 0b00110000},
+				{0b11111000, 0b00011111}
+				};
+{     
+		for(int j = 0; j <1; j++){
+			for(int i = 0; i < 15; i++){
+				byteToBuffer(addr + i, page + j, b[i][j]);
+			}
+		}
+}
+
+void main(void){
+	init();
+	while(1){
+		loop();
+	}
+}
+
+
 
 
 #define ACCX 1

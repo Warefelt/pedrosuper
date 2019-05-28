@@ -27,8 +27,8 @@
 
 */
 
-
-
+#include <time.h>
+#include <stdlib.h>
 #include "delays.h"
 #include "keyfuncs.h"
 #include "lcdascii.h"
@@ -75,7 +75,7 @@ void init(){
     #endif
 	
     gpioInit();
-    
+    srand(time(NULL));   // Initialization, should only be called once.
     graphic_initialize();
 //    ascii_initialize();     //todo?
 
@@ -138,7 +138,10 @@ void loadNewLevelSegmentRight(){
 }
 
 void loadLvl(int start){        //loads a 64px wide levelstrip of new peppers into the backBuffer (starting at start, moving right)
-    int type;// = randomnumber, några olika varianter 1=____, 2=_oo_, 3=_8__, 4=_o_o mm.
+	
+	int type = rand() % 20;      // Returns a pseudo-random integer between 0 and 10, några olika varianter 1=____, 2=_oo_, 3=_8__, 4=_o_o mm.
+char* PepperStrips[20]{ "____", "_oo_", "_8__", "_o_o", "o__o", "_o__", "__8_", "_o8_", "__o_", "____", "____", "o___", "___o", "o_o_", "_8o_","_o__","__o_","o___", "___o","____"}
+	
 	
 	for(int i = 0; i < 64, i+=16){
 		loadPepperStrip(start + i, type[i]);
@@ -146,16 +149,18 @@ void loadLvl(int start){        //loads a 64px wide levelstrip of new peppers in
 	drawGround(start, start+64);
     
 }
-
-void loadPepperStrip(int start, char type){
+//bör fungera
+void loadPepperStrip(int start, char* type){
+	
 	switch(type){
 		case '_': 
 			break;
 		case 'o': 
-			//loadPepper
+			loadPepperAt(start, 6);
 			break;
-		case '8': 
-			//loadPepperOnPepper
+		case '8':
+			loadPepperAt(start, 6);
+			loadPepperAt(start, 4);
 			break;
 			
 	}
@@ -176,7 +181,34 @@ void onWin(){
 
 }
 
-
+//bör fungera
+void loadPepperAt(int addr, int page){
+		char b[][2]= 
+				{
+				{0b11111000, 0b00000111}, 
+				{0b00001100, 0b00011100}, 
+				{0b00000100, 0b00110000},
+				{0b00001100, 0b11100000},
+				{0b11101000, 0b10000111},
+				{0b00011100, 0b11011000},
+				{0b00000110, 0b01100000}, 
+				{0b00000111, 0b00100000},
+				{0b00001111, 0b00100000},
+				{0b00001011, 0b01100000},
+				{0b00111001, 0b11010000}, 
+				{0b11001101, 0b10001111},
+				{0b00000100, 0b11000000}, 
+				{0b00000100, 0b01100000},
+				{0b00001100, 0b00110000},
+				{0b11111000, 0b00011111}
+				};
+{     
+		for(int j = 0; j <1; j++){
+			for(int i = 0; i < 15; i++){
+				byteToBuffer(addr + i, page + j, b[i][j]);
+			}
+		}
+}
 
 
 

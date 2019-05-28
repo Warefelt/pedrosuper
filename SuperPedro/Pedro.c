@@ -8,7 +8,6 @@
 #define MAX_VELX 4
 #define ACCX 1
 #define VELY -10 //basvelocity vid hopp
-#define PEDRO_POSX 0	//Pedros position på skärmen
 
 
 
@@ -107,7 +106,7 @@ void draw(POBJECT object){		//Ritar ut pedro enligt hans position och utseende. 
 	 unsigned char* man = object->sprite;
         for(j = 0; j < (object->height)/8; j++) {
             graphic_write_command(LCD_SET_PAGE | (((63-object->posy-object->height)/8)+j), B_CS1);
-            graphic_write_command(LCD_SET_ADD | PEDRO_POSX, B_CS1);
+            graphic_write_command(LCD_SET_ADD | object->posx, B_CS1);
             for(i = 0; i < object->width; i++) {
 				unsigned char byte = *(man+(j*object->width)+i);
                 graphic_write_data(byte, B_CS1);
