@@ -2,12 +2,8 @@
 #include "LcdAscii.h"
 
 
-#define MAX_POINTS 100
+extern char backBuffer[256][8];
 
-
-#define MAX_VELX 4
-#define ACCX 1
-#define VELY -10 //basvelocity vid hopp
 
 static volatile unsigned char pedro_still[4][20] = {{0b00000000, 0b11100000, 0b11110000, 0b11111000, 0b11111100, 0b11111110, 0b11111110, 0b11111111, 0b11111111, 0b01111111, 0b00011111, 0b00011111, 0b00001111, 0b00001110, 0b00011100, 0b00011000, 0b00110000, 0b01100000, 0b10000000, 0b00000000},
 						{0b00011111, 0b01111111, 0b11111111, 0b11000111, 0b00011111, 0b00011111, 0b10000011, 0b00000001, 0b00001011, 0b00000100, 0b00100100, 0b00110100, 0b00000100, 0b00000000, 0b00000000, 0b00100100, 0b01110010, 0b10000010, 0b00000111, 0b11111000},
@@ -30,10 +26,15 @@ static volatile unsigned char pedro_walk2[4][20] = {{0b00000000, 0b11000000, 0b1
 
 static OBJECT Pedro = 
 {
-	32, 20,				//height, width
-	0,32,				//initial startposition
-	0,0,				//Hastighet
-	0,0,				//Acceleration
+	32,
+ 20,				//height, width
+	32,
+    0,				//initial startposition
+	0,
+    0,				//Hastighet
+	0,
+    0,				//Acceleration
+    0,
 	&pedro_still,		//Sprite
 	&draw,
 	0, 
@@ -49,9 +50,14 @@ void move(){								//Kollar knapptryck och uppdaterar alla Pedros värden
     
     if(Pedro.velx > 0){
         shiftLeft();
+        delaymillis(200/Pedro.velx);
+        Pedro.distance++;
     }
     else if(Pedro.velx < 0){
         shiftRight();
+        delaymillis(200/(-Pedro.velx));
+        Pedro.distance++;
+
     }
     graphic_draw_screen();
     draw(&Pedro);  //extra args? FLYTTA? han kan ritas ut med resten av skärmen_________________________________________________________________________________* 
@@ -96,6 +102,7 @@ void checkKeys(){
         if(isUpKey()){
 			Pedro.vely = VELY;    //jump
             Pedro.accy = 1;
+            Pedro.sprite = pedro_jump;
 		}
 	}
     
@@ -104,7 +111,6 @@ void checkKeys(){
 void applyPhysics(){
     //physics
     Pedro.velx += Pedro.accx;
-	Pedro.posx += Pedro.velx;
     
     Pedro.vely += Pedro.accy;
 	Pedro.posy += Pedro.vely;
@@ -112,9 +118,8 @@ void applyPhysics(){
 }
 
 char isJumping(){
-    //return Pedro.posy < .....//groundlvl+pedroheight
+    return Pedro.posy < 0;       //groundlvl+pedroheight
 }
-
 
 
 void draw(POBJECT object){
@@ -150,39 +155,14 @@ void draw(POBJECT object){
         }
 }
 
-char touchesPepper(POBJECT Pedro){
+char touchesPepper(){
     //kolla nedre hörnen (om Pedro bredare än 16px även i mitten) först, om pixeln är 1 -> Pedro.touches = 1 innan
     //jfr pedrobyte & backbufferbyte
-	
-	int pepperStripe = 0;
-	for(int i = 0; i < 20; i++){
-		char part = backBuffer[64+(Pedro->posx)+i][7-(Pedro->posy)/8];
-		char mask = 1<<(7-(Pedro->posy%8));
-		part &= mask;
-		pepperStripe |= (part<<24-i+(Pedro->posy%8));
-	}	
-	int bottomRow = getBottomRow(Pedro,0);
-	if(bottomRow & pepperStripe){
-		return 1;
-	}
-	return 0;
-	
+    return 0;
 }
 
-int getBottomRow(POBJECT Pedro,int posyposy){
-	unsigned char* man = Pedro->sprite;
-	unsigned char i;
-	int s = 0;
-	for(i = 0; i < Pedro->width; i++){
-		unsigned char take = *(man+(((Pedro->height)/8)-1)*(Pedro->width)+i);
-		int part = (int)take;
-		part &= (1<<(7-posyposy));
-		s |= part<<(24-i+posyposy);
-	}
-	if((s & 0x03FFFFFF) == 0){
-		return getBottomRow(Pedro,(posyposy+1));
-	}
-	return s;
+int getDistance(){
+    return Pedro.distance;
 }
 /*
 int objtouchesborder(POBJECT o){

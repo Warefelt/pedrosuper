@@ -1,6 +1,6 @@
 #include "randomNum.h"
 
-// typedef uint32_t rngword_t;
+//typedef uint32_t rngword_t;
 
 void seedRng(rngword_t* state, uint32_t seed) {
 	*state = seed;

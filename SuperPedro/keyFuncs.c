@@ -40,6 +40,7 @@ char isUpKey(){
 		kbdActivate(0);         //power off kbd-rows
 		return 1;
 	}
+    kbdActivate(0);         //power off kbd-rows
 	return 0;
 }
 char isRightKey(){
@@ -48,7 +49,8 @@ char isRightKey(){
 		kbdActivate(0);         //power off kbd-rows
 		return 1;
 	}
-return 0;
+    kbdActivate(0);         //power off kbd-rows
+    return 0;
 	
 }
 char isLeftKey(){
@@ -57,6 +59,7 @@ char isLeftKey(){
 		kbdActivate(0);         //power off kbd-rows
 		return 1;
 	}
+    kbdActivate(0);         //power off kbd-rows
 	return 0;
 	
 }
