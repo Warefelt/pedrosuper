@@ -117,16 +117,36 @@ char isJumping(){
 
 
 
-void draw(POBJECT object){		//Ritar ut pedro enligt hans position och utseende. Dessa står fria att ändras i andra metoder
+void draw(POBJECT object){
 	 unsigned char i, j;
 	 unsigned char* man = object->sprite;
-        for(j = 0; j < (object->height)/8; j++) {
-            graphic_write_command(LCD_SET_PAGE | (((63-object->posy-object->height)/8)+j), B_CS1);
-            graphic_write_command(LCD_SET_ADD | object->posx, B_CS1);
-            for(i = 0; i < object->width; i++) {
-				unsigned char byte = *(man+(j*object->width)+i);
-                graphic_write_data(byte, B_CS1);
-            }
+	 int shift = object->posy%8;
+        for(j = 0; j < ((object->height)/8)+1; j++) {
+			if(!(object->posy+object->height > 64 && j < ((64-object->posy)/8))){						//If page is over his bottom position
+				graphic_write_command(LCD_SET_PAGE | (((63-object->posy-object->height)/8)+j), B_CS1);
+				graphic_write_command(LCD_SET_ADD | object->posx, B_CS1);
+				for(i = 0; i < object->width; i++) {
+					if(j == 0){
+						unsigned char* adress = (man+(j*object->width)+i);
+						unsigned char byte = *adress;
+						byte = byte<<(8-shift);
+						graphic_write_data(byte, B_CS1);
+					}
+					else{
+						unsigned char* adress = (man+((j-1)*object->width)+i);
+						unsigned char byte = *adress;
+						byte = byte>>(shift);
+						if(j < (object->height)/8){
+							unsigned char tillagg = *(adress+object->width);
+							tillagg &= (0xFF>>(8-shift));		//nollställer överblivna bitar som ej ingår i bildförskjutningen
+							tillagg = tillagg<<(8-shift);
+							byte |= tillagg;
+						}
+						byte |= backBuffer[64+(object->posx)+i][7-(object->posy)/8];
+						graphic_write_data(byte, B_CS1);
+					}
+				}
+			}
         }
 }
 
