@@ -99,37 +99,33 @@ void loop(){
 	//
 	//	
     drawGround(0, 127);
+	
 	while(1){
-		update();
+		//
+		//ändra Pedros properties
+		if(backBuffer[63][7] == 0){
+			loadNewLevelSegmentLeft()
+		}
+		if(backBuffer[192][7] == 0){
+			loadNewLevelSegmentRight()
+		}
+		
+		move();			//flyttar hela skärmen så det ser ut som att Pedro rör sig
+			
+		//win/loss
+		if(touchesPepper() == 1){
+			break;		//startar om spelet från början
+		}
+		/*if(Pedro.distance == ){
+			onWin();
+		}*/
 	}
-	//	
-	//	
-	//	
-	//	
-	//	
+	
 }
 
 
 void update(){
-	//
-	//ändra Pedros properties
-	if(backBuffer[63][7] == 0){
-		loadNewLevelSegmentLeft()
-	}
-    if(backBuffer[192][7] == 0){
-		loadNewLevelSegmentRight()
-	}
-	
-	move();	//flyttar hela skärmen så det ser ut som att Pedro rör sig
-    	
-	//win/loss
-	if(touchesPepper() == 1){
-		onLoss();
-	}
-/*	if(Pedro.distance == ){
-		onWin();
-	}*/
-	
+
 }
 
 
@@ -142,18 +138,28 @@ void loadNewLevelSegmentRight(){
 }
 
 void loadLvl(int start){        //loads a 64px wide levelstrip of new peppers into the backBuffer (starting at start, moving right)
-    //några olika varianter ____, _oo_, _8__, _o_o mm.
-    
+    int type;// = randomnumber, några olika varianter 1=____, 2=_oo_, 3=_8__, 4=_o_o mm.
+	
+	for(int i = 0; i < 64, i+=16){
+		loadPepperStrip(start + i, type[i]);
+	}
+	drawGround(start, start+64);
     
 }
 
-void onLoss(){
-	
+void loadPepperStrip(int start, char type){
+	switch(type){
+		case '_': 
+			break;
+		case 'o': 
+			//loadPepper
+			break;
+		case '8': 
+			//loadPepperOnPepper
+			break;
+			
+	}
 }
-void onWin(){
-	
-}
-
 
 
 void drawGround(int from, int to){
@@ -164,6 +170,11 @@ void drawGround(int from, int to){
 }
 
 
+
+void onWin(){
+	//ska vi ha med denna?
+
+}
 
 
 
