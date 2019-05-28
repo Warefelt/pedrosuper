@@ -34,7 +34,7 @@ static OBJECT Pedro =
 	0,32,				//initial startposition
 	0,0,				//Hastighet
 	0,0,				//Acceleration
-	{0},		//Sprite
+	&pedro_still,		//Sprite
 	&draw,
 	0, 
     /*komplettera?*/
