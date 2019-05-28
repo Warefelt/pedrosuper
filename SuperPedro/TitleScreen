@@ -15,7 +15,14 @@ void drawTitleScteen(void)
         for(j = 0; j < 8; j++) {
             graphic_write_command(LCD_SET_PAGE | j, B_CS1);
             graphic_write_command(LCD_SET_ADD | i, B_CS1);
-            for(i = 0; i < 128; i++) {
+            for(i = 0; i < 64; i++) {
+                graphic_write_data(*(startAdress+(j*128)+i), B_CS1);
+            }
+        }
+		 for(j = 0; j < 8; j++) {
+            graphic_write_command(LCD_SET_PAGE | j, B_CS1);
+            graphic_write_command(LCD_SET_ADD | i, B_CS1);
+            for(i = 64; i < 128; i++) {
                 graphic_write_data(*(startAdress+(j*128)+i), B_CS1);
             }
         }
