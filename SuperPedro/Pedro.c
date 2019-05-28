@@ -150,9 +150,39 @@ void draw(POBJECT object){
         }
 }
 
-char touchesPepper(){
+char touchesPepper(POBJECT Pedro){
     //kolla nedre hörnen (om Pedro bredare än 16px även i mitten) först, om pixeln är 1 -> Pedro.touches = 1 innan
     //jfr pedrobyte & backbufferbyte
+	
+	int pepperStripe = 0;
+	for(int i = 0; i < 20; i++){
+		char part = backBuffer[64+(Pedro->posx)+i][7-(Pedro->posy)/8];
+		char mask = 1<<(7-(Pedro->posy%8));
+		part &= mask;
+		pepperStripe |= (part<<24-i+(Pedro->posy%8));
+	}	
+	int bottomRow = getBottomRow(Pedro,0);
+	if(bottomRow & pepperStripe){
+		return 1;
+	}
+	return 0;
+	
+}
+
+int getBottomRow(POBJECT Pedro,int posyposy){
+	unsigned char* man = Pedro->sprite;
+	unsigned char i;
+	int s = 0;
+	for(i = 0; i < Pedro->width; i++){
+		unsigned char take = *(man+(((Pedro->height)/8)-1)*(Pedro->width)+i);
+		int part = (int)take;
+		part &= (1<<(7-posyposy));
+		s |= part<<(24-i+posyposy);
+	}
+	if((s & 0x03FFFFFF) == 0){
+		return getBottomRow(Pedro,(posyposy+1));
+	}
+	return s;
 }
 /*
 int objtouchesborder(POBJECT o){
