@@ -8,4 +8,6 @@ char isUpKey();
 char isRightKey();
 char isLeftKey();
 
+char keyb();
+
 #endif //KEYFUNCS_H
