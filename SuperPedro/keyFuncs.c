@@ -35,7 +35,7 @@ int kbdGetCol(){
 
 char isUpKey(){
 	kbdActivate(3);	//row3
-	kbdActivate(4);         //power off kbd-rows
+	//kbdActivate(4);         //power off kbd-rows
 	if(kbdGetCol() == 3){
 		kbdActivate(0);         //power off kbd-rows
 		return 1;
@@ -63,6 +63,18 @@ char isLeftKey(){
 	return 0;
 	
 }
+
+
+char isResetKey(){
+    kbdActivate(1);
+	if(kbdGetCol() == 1){
+		kbdActivate(0);         //power off kbd-rows
+		return 1;
+	}
+    kbdActivate(0);         //power off kbd-rows
+	return 0;
+}
+
 
 
 unsigned char keyb(){

@@ -244,46 +244,6 @@ void shiftLeft(){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
- #define PORT_BASE ((volatile unsigned int*) (0x40021000))
-/*definiera word-adresser för initieringar*/
-#define portModer ((volatile unsigned int*) (0x40021000))
-#define portOtyper ((volatile unsigned short*) (0x40021004))
-#define portOspeedr ((volatile unsigned int*) (0x40021008))
-#define portPupdr ((volatile unsigned int*) (0x4002100C))
-/* Definiera byte-adresser för data och styrregister*/
-#define portIdrLow ((volatile unsigned char*) (0x40021010))
-#define portIdrHigh ((volatile unsigned char*) (0x40021011))
-#define portOdrLow ((volatile unsigned char*) (0x40021014))
-#define portOdrHigh ((volatile unsigned char*) (0x40021015))
-
-#define B_E 0x40 // detta är till ascii' styrregister 
-#define B_SELECT 4
-#define B_RW 2
-#define B_RS 1
-
-#define STK_CTRL ((volatile unsigned int*) 0xE000E010)
-#define STK_LOAD ((volatile unsigned int*) 0xE000E014)
-#define STK_VAL ((volatile unsigned int*) 0xE000E018)
  
  
  void ascii_ctrl_bit_set(unsigned char x){
@@ -294,8 +254,8 @@ void shiftLeft(){
 
 void ascii_ctrl_bit_clear(unsigned char x){
 	unsigned char c = *portOdrLow;
-	c &= (B_SELECT | ~x);
-	*portOdrLow = c;
+	c &= ~x;
+	*portOdrLow = c | B_SELECT;
 }
 
 void ascii_write_controller(unsigned char c){
@@ -347,25 +307,43 @@ unsigned char ascii_read_status(void){
 
 void ascii_command(unsigned char command){
 	while ((ascii_read_status() & 0x80)==0x80){}	/*vänta tills display är klar att ta emot kommando */
-	delay_mikro(8); 								/*latenstid för kommando*/
+	delaymicros(8); 								/*latenstid för kommando*/
 	ascii_write_cmd(command);						
-	delay_milli (2); 								/*istället för 1,53 ms*/
+	delaymillis (2); 								/*istället för 1,53 ms*/
 }
 
 void ascii_init(void){
-	ascii_command(0x38);							/* 2 rader, 5x8 punkers tecken*/
-	ascii_command(0x0E);							/* tänd display , tänd markör "cursor", konstant visning*/
-	ascii_command(0x04);							/* adressering med increment, inget skift av adressbufferten*/
+    delaymicros(20);
+	ascii_write_controller(0x38);   //2 rader, 5x8 punkter
+	delaymicros(39);
+    
+    delaymicros(20);
+	ascii_write_controller(0x0E);      // Tänd display, tänd markör ("cursor"), konstant visning.
+	delaymicros(39);
+	
+	delaymicros(20);
+	ascii_write_controller(0x01);  	// Clear disp
+	delaymicros(39);
+	
+	delaymicros(20);
+	ascii_write_controller(0x06);  // Adressering med "increment", inget skift av adressbuffern
+	delaymicros(39);					/* adressering med increment, inget skift av adressbufferten*/
+}
+
+void ascii_clear_disp(){
+    delaymicros(20);
+	ascii_write_controller(0x01);  	// Clear disp
+	delaymicros(39);
 }
 
 void ascii_write_char(unsigned char c){
 	while ((ascii_read_status() & 0x80)==0x80){}	/*vänta tills display är klar att ta emot kommando */
-	delay_mikro(8); 
+	delaymicros(8); 
 	ascii_write_data(c);
-	delay_milli (2); 
+	delaymillis (2); 
 }
 
-void ascii_gotoxy( int row, int column){
+void ascii_gotoxy( int column, int row){
 	if(row >=1 && row <=20 && column >=1 && column <=2){
 		unsigned int adress = row-1;
 		if (column == 2){
@@ -375,21 +353,16 @@ void ascii_gotoxy( int row, int column){
 	}
 }
 
-void init_app (void){
-	#ifdef USBDM
-	//starta klockor port D och E
-	*((unsigned long*)0x40023830)= 0x80;
-	*portModer = 0x55555555;
-	#endif
-	
-}
-
-void stringToAscii(char str[], int row, int col){
+void stringToAscii(char str[], int col, int row){
+    graphic_ctrl_bit_clear(B_E);
+    ascii_ctrl_bit_set(B_E);
+    
 	char *s;
-	ascii_gotoxy(row,col);
+	ascii_gotoxy(col,row);
 	s = str;
 	while (*s)
 		ascii_write_char(*s++);
 	
+    ascii_ctrl_bit_clear(B_E);
+    graphic_ctrl_bit_set(B_E);
 }
-	

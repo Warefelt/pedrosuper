@@ -55,8 +55,6 @@ void shiftLeft();
 
 
 
-
-
 //För bara ascii
 
 #define PORT_BASE ((volatile unsigned int*) (0x40021000))
@@ -75,10 +73,6 @@ void shiftLeft();
 #define B_SELECT 4
 #define B_RW 2
 #define B_RS 1
-
-#define STK_CTRL ((volatile unsigned int*) 0xE000E010)
-#define STK_LOAD ((volatile unsigned int*) 0xE000E014)
-#define STK_VAL ((volatile unsigned int*) 0xE000E018)
  
  
 void ascii_ctrl_bit_set(unsigned char x);
@@ -95,6 +89,7 @@ unsigned char ascii_read_status(void);
 
 void ascii_command(unsigned char command);
 void ascii_init(void);
+void ascii_clear_disp();
 void ascii_gotoxy( int row, int column);
 
 void init_app (void);

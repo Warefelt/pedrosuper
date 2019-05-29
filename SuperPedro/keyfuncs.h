@@ -7,7 +7,9 @@ int kbdGetCol();
 char isUpKey();
 char isRightKey();
 char isLeftKey();
+char isResetKey();
 
-char keyb();
+unsigned char keyb();
+
 
 #endif //KEYFUNCS_H

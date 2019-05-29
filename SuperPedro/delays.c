@@ -2,7 +2,7 @@
 
 void delay_250ns(){
     *STK_CTRL=0;
-    *STK_LOAD=1;//168/4-1;
+    *STK_LOAD=168/4-1;
     *STK_VAL=0;
     *STK_CTRL=5;
     while((*STK_CTRL & 0x10000)==0);
@@ -11,7 +11,7 @@ void delay_250ns(){
 
 void delay_500ns(){
 	*STK_CTRL=0;
-    *STK_LOAD=1;//168/2-1;
+    *STK_LOAD=168/2-1;
     *STK_VAL=0;
     *STK_CTRL=5;
     while((*STK_CTRL & 0x10000)==0);
@@ -29,5 +29,5 @@ void delaymicros(int micros){
 
 
 void delaymillis(int millis){
-	delaymicros(millis);// * 1000);
+	delaymicros(millis * 1000);
 }

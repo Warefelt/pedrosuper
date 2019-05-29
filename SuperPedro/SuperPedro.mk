@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Eric
-Date                   :=28/05/2019
+Date                   :=29/05/2019
 CodeLitePath           :=C:/cseapp/CodeLite
 LinkerName             :=$(CodeLiteDir)/tools/gcc-arm/bin/arm-none-eabi-g++.exe
 SharedObjectLinkerName :=$(CodeLiteDir)/tools/gcc-arm/arm-none-eabi-g++.exe -shared -fPIC
@@ -53,7 +53,7 @@ AR       := $(CodeLiteDir)/tools/gcc-arm/bin/arm-none-eabi-ar.exe rcu
 CXX      := $(CodeLiteDir)/tools/gcc-arm/bin/arm-none-eabi-g++.exe
 CC       := $(CodeLiteDir)/tools/gcc-arm/bin/arm-none-eabi-gcc.exe
 CXXFLAGS :=  -g -O0 -W $(Preprocessors)
-CFLAGS   :=  -Wa,-adhln=test.s -g -O0 -w -mthumb -march=armv6-m  -mfloat-abi=soft -std=c99 -mthumb -march=armv6-m $(Preprocessors)
+CFLAGS   :=  -Wa,-adhln=test.s -g -O0 -mthumb -march=armv6-m  -mfloat-abi=soft -pedantic -std=c99 -Wall -mthumb -march=armv6-m $(Preprocessors)
 ASFLAGS  := 
 AS       := $(CodeLiteDir)/tools/gcc-arm/bin/arm-none-eabi-as.exe
 
@@ -66,7 +66,7 @@ ARM_V6LIB:=$(CodeLiteDir)/tools/gcc-arm/arm-none-eabi/lib/thumb/v6-m
 ARM_GCC_V6LIB:=$(CodeLiteDir)/tools/gcc-arm/lib/gcc/arm-none-eabi/7.2.1/thumb/v6-m
 ARM_M4FPLIB:=$(CodeLiteDir)/tools/gcc-arm/arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard
 ARM_GCC_M4FPLIB:=$(CodeLiteDir)/tools/gcc-arm/lib/gcc/arm-none-eabi/7.2.1/thumb/v7e-m
-Objects0=$(IntermediateDirectory)/randomNum.c$(ObjectSuffix) $(IntermediateDirectory)/main.c$(ObjectSuffix) $(IntermediateDirectory)/delays.c$(ObjectSuffix) $(IntermediateDirectory)/Pedro.c$(ObjectSuffix) $(IntermediateDirectory)/LcdAscii.c$(ObjectSuffix) $(IntermediateDirectory)/keyFuncs.c$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/delays.c$(ObjectSuffix) $(IntermediateDirectory)/Pedro.c$(ObjectSuffix) $(IntermediateDirectory)/randomNum.c$(ObjectSuffix) $(IntermediateDirectory)/keyFuncs.c$(ObjectSuffix) $(IntermediateDirectory)/main.c$(ObjectSuffix) $(IntermediateDirectory)/LcdAscii.c$(ObjectSuffix) 
 
 
 
@@ -103,22 +103,6 @@ PreBuild:
 ##
 ## Objects
 ##
-$(IntermediateDirectory)/randomNum.c$(ObjectSuffix): randomNum.c $(IntermediateDirectory)/randomNum.c$(DependSuffix)
-	$(CC) $(SourceSwitch) "Z:/MOP/c-code/mop/SuperPedro/randomNum.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/randomNum.c$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/randomNum.c$(DependSuffix): randomNum.c
-	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/randomNum.c$(ObjectSuffix) -MF$(IntermediateDirectory)/randomNum.c$(DependSuffix) -MM randomNum.c
-
-$(IntermediateDirectory)/randomNum.c$(PreprocessSuffix): randomNum.c
-	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/randomNum.c$(PreprocessSuffix) randomNum.c
-
-$(IntermediateDirectory)/main.c$(ObjectSuffix): main.c $(IntermediateDirectory)/main.c$(DependSuffix)
-	$(CC) $(SourceSwitch) "Z:/MOP/c-code/mop/SuperPedro/main.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.c$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/main.c$(DependSuffix): main.c
-	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/main.c$(ObjectSuffix) -MF$(IntermediateDirectory)/main.c$(DependSuffix) -MM main.c
-
-$(IntermediateDirectory)/main.c$(PreprocessSuffix): main.c
-	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/main.c$(PreprocessSuffix) main.c
-
 $(IntermediateDirectory)/delays.c$(ObjectSuffix): delays.c $(IntermediateDirectory)/delays.c$(DependSuffix)
 	$(CC) $(SourceSwitch) "Z:/MOP/c-code/mop/SuperPedro/delays.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/delays.c$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/delays.c$(DependSuffix): delays.c
@@ -135,13 +119,13 @@ $(IntermediateDirectory)/Pedro.c$(DependSuffix): Pedro.c
 $(IntermediateDirectory)/Pedro.c$(PreprocessSuffix): Pedro.c
 	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/Pedro.c$(PreprocessSuffix) Pedro.c
 
-$(IntermediateDirectory)/LcdAscii.c$(ObjectSuffix): LcdAscii.c $(IntermediateDirectory)/LcdAscii.c$(DependSuffix)
-	$(CC) $(SourceSwitch) "Z:/MOP/c-code/mop/SuperPedro/LcdAscii.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/LcdAscii.c$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/LcdAscii.c$(DependSuffix): LcdAscii.c
-	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/LcdAscii.c$(ObjectSuffix) -MF$(IntermediateDirectory)/LcdAscii.c$(DependSuffix) -MM LcdAscii.c
+$(IntermediateDirectory)/randomNum.c$(ObjectSuffix): randomNum.c $(IntermediateDirectory)/randomNum.c$(DependSuffix)
+	$(CC) $(SourceSwitch) "Z:/MOP/c-code/mop/SuperPedro/randomNum.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/randomNum.c$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/randomNum.c$(DependSuffix): randomNum.c
+	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/randomNum.c$(ObjectSuffix) -MF$(IntermediateDirectory)/randomNum.c$(DependSuffix) -MM randomNum.c
 
-$(IntermediateDirectory)/LcdAscii.c$(PreprocessSuffix): LcdAscii.c
-	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/LcdAscii.c$(PreprocessSuffix) LcdAscii.c
+$(IntermediateDirectory)/randomNum.c$(PreprocessSuffix): randomNum.c
+	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/randomNum.c$(PreprocessSuffix) randomNum.c
 
 $(IntermediateDirectory)/keyFuncs.c$(ObjectSuffix): keyFuncs.c $(IntermediateDirectory)/keyFuncs.c$(DependSuffix)
 	$(CC) $(SourceSwitch) "Z:/MOP/c-code/mop/SuperPedro/keyFuncs.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/keyFuncs.c$(ObjectSuffix) $(IncludePath)
@@ -150,6 +134,22 @@ $(IntermediateDirectory)/keyFuncs.c$(DependSuffix): keyFuncs.c
 
 $(IntermediateDirectory)/keyFuncs.c$(PreprocessSuffix): keyFuncs.c
 	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/keyFuncs.c$(PreprocessSuffix) keyFuncs.c
+
+$(IntermediateDirectory)/main.c$(ObjectSuffix): main.c $(IntermediateDirectory)/main.c$(DependSuffix)
+	$(CC) $(SourceSwitch) "Z:/MOP/c-code/mop/SuperPedro/main.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.c$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/main.c$(DependSuffix): main.c
+	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/main.c$(ObjectSuffix) -MF$(IntermediateDirectory)/main.c$(DependSuffix) -MM main.c
+
+$(IntermediateDirectory)/main.c$(PreprocessSuffix): main.c
+	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/main.c$(PreprocessSuffix) main.c
+
+$(IntermediateDirectory)/LcdAscii.c$(ObjectSuffix): LcdAscii.c $(IntermediateDirectory)/LcdAscii.c$(DependSuffix)
+	$(CC) $(SourceSwitch) "Z:/MOP/c-code/mop/SuperPedro/LcdAscii.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/LcdAscii.c$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/LcdAscii.c$(DependSuffix): LcdAscii.c
+	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/LcdAscii.c$(ObjectSuffix) -MF$(IntermediateDirectory)/LcdAscii.c$(DependSuffix) -MM LcdAscii.c
+
+$(IntermediateDirectory)/LcdAscii.c$(PreprocessSuffix): LcdAscii.c
+	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/LcdAscii.c$(PreprocessSuffix) LcdAscii.c
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

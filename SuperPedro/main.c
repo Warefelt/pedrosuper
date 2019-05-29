@@ -7,7 +7,7 @@
 #####TODO#####
 
 -rightshift()
-
+-fixa paprikorna? s.a ej upponer
 -includes
  * app init
  * Pedro ska vända sig (spegelvänd bild) 
@@ -28,7 +28,7 @@
 */
 
 
-#include "TitleScreen.h"
+#include "titleScreen.h"
 #include "delays.h"
 #include "keyfuncs.h"
 #include "lcdascii.h"
@@ -38,6 +38,8 @@
 
 #include <time.h>
 #include <stdlib.h>
+#include <stdio.h>
+
 
 
 void startup(void) __attribute__((naked)) __attribute__((section (".start_section")) );
@@ -55,6 +57,7 @@ __asm volatile(
 
 //GLOBALS
 extern char backBuffer[256][8];
+uint32_t seed;
 
 //#define USBDM
 #define NONSIMULATOR
@@ -76,15 +79,20 @@ void gpioInit(){
 
 void init(){
     #ifdef USBDM
-		*((unsigned long*)0x40023830)=0x18;
+        *((unsigned long*)0x40023830)=0x18;
+        *((unsigned long*)0x40023844)|=0x4000;
+        //*((unsigned long*)0xE000ED08)=0x2001C000;
+        __asm volatile( "LDR R0,=0x08000208\n" "BLX R0\n ");
     #endif
 	
     gpioInit();
     
-    graphic_initialize();
-    //ascii_init();     //todo?
+    ascii_init();
     
-    //seedRng(0, 555);
+    graphic_initialize();
+    
+    seed = 1337;
+    seedRng(&seed, seed);
 
 	clear_backBuffer();
 	graphic_draw_screen();
@@ -102,34 +110,42 @@ void init(){
 
 
 void loop(){
-	drawTitleScreen(void)
-	while (1){
-		if (keyb !=0xFF){
-			break;
-		}
-	}
+	//(splash start)	
+    /*
+    while(1){
+        if(keyb() != 0xFF){
+            break;
+        }
+        drawTitleScreen();
+    }    
+    */
 	//
 	//	
-    drawGround(64, 191);
-		
+    //drawGround(64, 191);
+	
 	while(1){
 		//
 		//ändra Pedros properties
-		if(backBuffer[63][7] == 0){
+		if(getDistance() % 64 == 0 && getVelx < 0){
 			loadNewLevelSegmentLeft();
 		}
-		if(backBuffer[192][7] == 0){
+		if(getDistance() % 64 == 0 && getVelx >= 0){
 			loadNewLevelSegmentRight();
 		}
 		
 		move();			//flyttar hela skärmen så det ser ut som att Pedro rör sig
         
-//        char* buffer;
-//        itoa(getDistance(), buffer, 10);
-//        stringToAscii();
-			
+        showDistance();
+        
 		//win/loss
+        
+        if(isResetKey()){
+            init();
+            resetPedro();
+        }
 		if(touchesPepper() == 1){
+            init();
+            resetPedro();
 			break;		//startar om spelet från början
 		}
 		/*if(Pedro.distance == ){
@@ -172,8 +188,8 @@ void loadPepperAt(int addr, int page){
 				{0b11111000, 0b00011111}
 				};
      
-		for(int j = 0; j <1; j++){
-			for(int i = 0; i < 15; i++){
+		for(int j = 0; j < 2; j++){
+			for(int i = 0; i < 16; i++){
 				byteToBuffer(addr + i, page + j, b[i][j]);
 			}
 		}
@@ -199,26 +215,27 @@ void loadPepperStrip(int start, char type){
 
 
 void loadLvl(int start){        //loads a 64px wide levelstrip of new peppers into the backBuffer (starting at start, moving right)
-	
-	//int type = rand() % 20;      // Returns a pseudo-random integer between 0 and 10, några olika varianter 1=____, 2=_oo_, 3=_8__, 4=_o_o mm.
-    char PepperStrips[][4] = { "____", "_oo_", "_8__", "_oo_", "_o__", "_o__", "__8_", "__8_", "__o_", "____", "____", "__o_", "__o_", "_oo_", "_8__","_o__","__o_","_o__", "__o_","____"};
+	//int seed = getDistance();
+    int rand = (nextRnd(&seed) % 19);
+	//int type = nextRnd() % 20;      // Returns a pseudo-random integer between 0 and 10, några olika varianter 1=____, 2=_oo_, 3=_8__, 4=_o_o mm.
+    char PepperStrips[][4] = { "____", "_oo_", "_8__", "_o_o", "o__o", "_o__", "__8_", "_o8_", "__o_", "____", "____", "o___", "___o", "o_o_", "_8o_","_o__","__o_","o___", "___o","____"};
 	
 	
 	for(int i = 0; i < 4; i++){
-		loadPepperStrip(start + i*16, PepperStrips[2][i]);
+		loadPepperStrip(start + i*16, PepperStrips[rand][i]);
 	}
-	drawGround(start, start+63);
+	//drawGround(start, start+63);
     
 }
 
-
+/*
 void drawGround(int from, int to){
-    char c = 0b00011000;
+    char c = 0b10000000;
     for(from; from <= to; from++){
         backBuffer[from][7] |= c;
     }
 }
-
+*/
 
 
 void onWin(){
@@ -227,7 +244,16 @@ void onWin(){
 
 
 
-
+void showDistance(){
+    static char buffer[20];
+    for(int i = 0; i < 20; i++){
+        buffer[i] = 0;
+    }
+    int d = getDistance();
+    itoa(d, buffer, 10);
+    ascii_clear_disp();
+    stringToAscii(buffer, 1, 1);
+}
 
 
 
@@ -249,7 +275,22 @@ void onWin(){
 
 
 void main(void){
-	init();
+    init();
+    
+    char buffer[20];
+    int a = 10;
+    itoa(a, buffer, 10);
+    stringToAscii(buffer, 1, 1);
+    int p = 0;
+#if 0
+    while(1) {
+        ascii_gotoxy( p % 20 + 1, p / 20 % 2 + 1);
+        ascii_write_char(p % 29 + 'a');
+        ascii_write_char((p + 7) % 29 + 'a');
+        delaymicros(100 * 1000);
+        p++;
+    }
+#endif
 	while(1){
 		loop();
 	}
