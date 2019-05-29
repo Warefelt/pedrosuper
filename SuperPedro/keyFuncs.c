@@ -63,3 +63,19 @@ char isLeftKey(){
 	return 0;
 	
 }
+
+
+unsigned char keyb(){
+    char key[] = {1,2,3,10,4,5,6,11,7,8,9,12,14,0,15,13};
+    int row;
+    int col = 0;
+    
+    for(row = 1; row <= 4; row++){
+        kbdActivate(row);           //power kbd-rows
+        if(col = kbdGetCol()){      //drain kbd-cols
+            kbdActivate(0);         //power off kbd-rows
+            return (4*(row-1)+(col-1));
+        }
+    }
+    return 0xFF;
+}
