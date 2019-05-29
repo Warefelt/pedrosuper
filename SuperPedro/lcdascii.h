@@ -54,4 +54,53 @@ void shiftLeft();
 
 
 
+
+
+
+//För bara ascii
+
+#define PORT_BASE ((volatile unsigned int*) (0x40021000))
+/*definiera word-adresser för initieringar*/
+#define portModer ((volatile unsigned int*) (0x40021000))
+#define portOtyper ((volatile unsigned short*) (0x40021004))
+#define portOspeedr ((volatile unsigned int*) (0x40021008))
+#define portPupdr ((volatile unsigned int*) (0x4002100C))
+/* Definiera byte-adresser för data och styrregister*/
+#define portIdrLow ((volatile unsigned char*) (0x40021010))
+#define portIdrHigh ((volatile unsigned char*) (0x40021011))
+#define portOdrLow ((volatile unsigned char*) (0x40021014))
+#define portOdrHigh ((volatile unsigned char*) (0x40021015))
+
+#define B_E 0x40 // detta är till ascii' styrregister 
+#define B_SELECT 4
+#define B_RW 2
+#define B_RS 1
+
+#define STK_CTRL ((volatile unsigned int*) 0xE000E010)
+#define STK_LOAD ((volatile unsigned int*) 0xE000E014)
+#define STK_VAL ((volatile unsigned int*) 0xE000E018)
+ 
+ 
+void ascii_ctrl_bit_set(unsigned char x);
+void ascii_ctrl_bit_clear(unsigned char x);
+
+void ascii_write_controller(unsigned char c);
+void ascii_write_cmd(unsigned char command);
+void ascii_write_data(unsigned char data);
+void ascii_write_char(unsigned char c);
+
+unsigned char ascii_read_controller(void);
+unsigned char ascii_read_data(void);
+unsigned char ascii_read_status(void);
+
+void ascii_command(unsigned char command);
+void ascii_init(void);
+void ascii_gotoxy( int row, int column);
+
+void init_app (void);
+
+void stringToAscii(char str[], int row, int col);
+
+
+
 #endif //LCDASCII_H
