@@ -7,7 +7,7 @@
 #####TODO#####
 
 -rightshift()
--fixa paprikorna? s.a ej upponer
+
 -includes
  * app init
  * Pedro ska vända sig (spegelvänd bild) 
@@ -28,7 +28,7 @@
 */
 
 
-
+#include "TitleScreen.h"
 #include "delays.h"
 #include "keyfuncs.h"
 #include "lcdascii.h"
@@ -102,11 +102,16 @@ void init(){
 
 
 void loop(){
-	//(splash start)	
+	drawTitleScreen(void)
+	while (1){
+		if (keyb !=0xFF){
+			break;
+		}
+	}
 	//
 	//	
     drawGround(64, 191);
-	
+		
 	while(1){
 		//
 		//ändra Pedros properties
