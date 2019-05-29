@@ -201,7 +201,7 @@ void loadPepperStrip(int start, char type){
 void loadLvl(int start){        //loads a 64px wide levelstrip of new peppers into the backBuffer (starting at start, moving right)
 	
 	//int type = rand() % 20;      // Returns a pseudo-random integer between 0 and 10, några olika varianter 1=____, 2=_oo_, 3=_8__, 4=_o_o mm.
-    char PepperStrips[][4] = { "____", "_oo_", "_8__", "_o_o", "o__o", "_o__", "__8_", "_o8_", "__o_", "____", "____", "o___", "___o", "o_o_", "_8o_","_o__","__o_","o___", "___o","____"};
+    char PepperStrips[][4] = { "____", "_oo_", "_8__", "_oo_", "_o__", "_o__", "__8_", "__8_", "__o_", "____", "____", "__o_", "__o_", "_oo_", "_8__","_o__","__o_","_o__", "__o_","____"};
 	
 	
 	for(int i = 0; i < 4; i++){
