@@ -1,1 +1,0 @@
-./Debug/randomNum.c.o ./Debug/main.c.o ./Debug/delays.c.o ./Debug/Pedro.c.o ./Debug/LcdAscii.c.o ./Debug/keyFuncs.c.o   
