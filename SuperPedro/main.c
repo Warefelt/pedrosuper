@@ -111,12 +111,12 @@ void init(){
 
 void loop(){
 	//(splash start)	
-    /*
-    while(1){
+    
+    /*while(1){
         if(keyb() != 0xFF){
             break;
         }
-        drawTitleScreen();
+        //drawTitleScreen();
     }    
     */
 	//
@@ -135,7 +135,9 @@ void loop(){
 		
 		move();			//flyttar hela skärmen så det ser ut som att Pedro rör sig
         
-        showDistance();
+        if(getVelx() != 0){
+            showDistance();
+        }
         
 		//win/loss
         
@@ -218,7 +220,7 @@ void loadLvl(int start){        //loads a 64px wide levelstrip of new peppers in
 	//int seed = getDistance();
     int rand = (nextRnd(&seed) % 19);
 	//int type = nextRnd() % 20;      // Returns a pseudo-random integer between 0 and 10, några olika varianter 1=____, 2=_oo_, 3=_8__, 4=_o_o mm.
-    char PepperStrips[][4] = { "____", "_oo_", "_8__", "_o_o", "o__o", "_o__", "__8_", "_o8_", "__o_", "____", "____", "o___", "___o", "o_o_", "_8o_","_o__","__o_","o___", "___o","____"};
+    char PepperStrips[][4] = { "____", "_oo_", "_8__", "_oo_", "__o_", "_o__", "__8_", "__8_", "__o_", "____", "____", "_o__", "__o_", "__oo_", "_8__","_o__","__o_","_o__", "__o_","____"};
 	
 	
 	for(int i = 0; i < 4; i++){
@@ -245,14 +247,16 @@ void onWin(){
 
 
 void showDistance(){
-    static char buffer[20];
+    char buffer[20];
     for(int i = 0; i < 20; i++){
         buffer[i] = 0;
     }
-    int d = getDistance();
-    itoa(d, buffer, 10);
-    ascii_clear_disp();
-    stringToAscii(buffer, 1, 1);
+       
+        int d = getDistance();
+        itoa(d, buffer, 10);
+        ascii_clear_disp();
+        stringToAscii(buffer, 1, 1);
+       
 }
 
 
@@ -276,7 +280,7 @@ void showDistance(){
 
 void main(void){
     init();
-    
+    /*
     char buffer[20];
     int a = 10;
     itoa(a, buffer, 10);
@@ -290,7 +294,7 @@ void main(void){
         delaymicros(100 * 1000);
         p++;
     }
-#endif
+#endif*/
 	while(1){
 		loop();
 	}

@@ -78,6 +78,14 @@ void shiftLeft();
 void ascii_ctrl_bit_set(unsigned char x);
 void ascii_ctrl_bit_clear(unsigned char x);
 
+
+struct PEDROBUF{
+    union{
+        unsigned long long lng;
+        char c[8];
+    }
+}BUF[20];
+
 void ascii_write_controller(unsigned char c);
 void ascii_write_cmd(unsigned char command);
 void ascii_write_data(unsigned char data);

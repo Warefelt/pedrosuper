@@ -3,17 +3,17 @@
 
 #define MAX_POINTS 100
 
-#define MAX_VELX 4
+#define MAX_VELX 14
 #define ACCX 1
-#define ACCY -1
-#define VELY 10 //basvelocity vid hopp
+#define ACCY -0.14
+#define VELY 4 //basvelocity vid hopp
 
 typedef struct tObj{                  //Objektmall
 	int height;
 	int width;
 	int posx, posy;
-	int velx, vely;
-	int accx, accy;
+	double velx, vely;
+	double accx, accy;
     int distance;
 	char* sprite;
 	void (*draw) (struct tObj *);
@@ -27,6 +27,7 @@ void move();
 void checkKeys();
 void applyPhysics();
 char isJumping();
+char setSprite();
 void draw();
 void oldDraw();
 char touchesPepper();

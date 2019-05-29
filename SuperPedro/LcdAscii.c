@@ -176,12 +176,20 @@ void byteToScreenBuffer(int addr, int page, char c){
 void graphic_draw_screen(void) {
     uint8_t i, j, controller, c;
     unsigned int k = 0;
+    unsigned int m = 0;
     for(c = 0; c < 2; c++) {
         controller = (c == 0) ? B_CS1 : B_CS2;
         for(j = 0; j < 8; j++) {
             graphic_write_command(LCD_SET_PAGE | j, controller);
             graphic_write_command(LCD_SET_ADD | 0, controller);
             for(i = 0; i <= 63; i++, k++) {
+                /*if(((c*64 + i) >= 32) && ((c*64 + i) <= (52))){
+                    graphic_write_data(backBuffer[64+c*64 + i][j] | BUF[m].c[j], controller);
+                    m++;
+                }
+                else{
+                    graphic_write_data(backBuffer[64+c*64 + i][j], controller);
+                }*/
                 graphic_write_data(backBuffer[64+c*64 + i][j], controller);
             }
         }
@@ -318,7 +326,7 @@ void ascii_init(void){
 	delaymicros(39);
     
     delaymicros(20);
-	ascii_write_controller(0x0E);      // Tänd display, tänd markör ("cursor"), konstant visning.
+	ascii_write_controller(0x0C);      // Tänd display, tänd markör ("cursor"), konstant visning.
 	delaymicros(39);
 	
 	delaymicros(20);
@@ -332,8 +340,8 @@ void ascii_init(void){
 
 void ascii_clear_disp(){
     delaymicros(20);
-	ascii_write_controller(0x01);  	// Clear disp
-	delaymicros(39);
+	ascii_write_cmd(0x01);  	// Clear disp
+	delaymillis(2);
 }
 
 void ascii_write_char(unsigned char c){

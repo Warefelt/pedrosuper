@@ -68,17 +68,18 @@ void move(){								//Kollar knapptryck och uppdaterar alla Pedros värden
     
     if(Pedro.velx > 0){
         shiftLeft();
-        delaymillis(100/Pedro.velx);
+        delaymillis(50/(int)Pedro.velx);
         Pedro.distance++;
     }
     else if(Pedro.velx < 0){
         shiftRight();
-        delaymillis(100/(-Pedro.velx));
+        delaymillis(50/(int)(-Pedro.velx));
         Pedro.distance--;
 
     }
 
     if(Pedro.velx != 0 || Pedro.vely != 0){
+        //draw2();
         graphic_draw_screen();
         draw();  //extra args? FLYTTA? han kan ritas ut med resten av skärmen_________________________________________________________________________________*  
     }
@@ -97,7 +98,7 @@ void checkKeys(){
 	}
 	else if(!isRightKey() && isLeftKey())
 	{
-		if(Pedro.velx > -MAX_VELX){
+		if((int)Pedro.velx > -MAX_VELX){
 			Pedro.accx = -ACCX;    //accelerate left
 		}
 		else{
@@ -141,7 +142,7 @@ void applyPhysics(){
     Pedro.velx += Pedro.accx;
     
     Pedro.vely += Pedro.accy;
-	Pedro.posy += Pedro.vely;
+	Pedro.posy += (int)Pedro.vely;
     
 }
 
@@ -152,7 +153,8 @@ char isJumping(){
 
 #define distanceBetweenAnimationChange 4
 char facingLeft = 0;
-void setSprite(){
+char setSprite(){
+    char* lastSprite = Pedro.sprite;
 	if(Pedro.velx > 0){
 		facingLeft = 0;
 	}
@@ -171,45 +173,68 @@ void setSprite(){
 	else{
 		Pedro.sprite = pedro_walk1;
 	}
+    if(lastSprite == Pedro.sprite && Pedro.vely == 0){
+        return 0;
+    }
+    else {
+        return 1;
+    }
+}
+
+
+void draw2(){
+    char newsprite = setSprite();
+    
+    for(int i = 0; i < 20; i++){
+        for(int j = 0; j < 4; j++){
+            BUF[i].c[j+4] = *(Pedro.sprite + j*Pedro.width + i);
+        }
+    }
+    
+    for(int i = 0; i < 20; i++){
+        BUF[i].lng <<= Pedro.posy;
+    }
+    
 }
 
 void draw(){
     
-    setSprite();
-    
-	 unsigned char i, j;
-	 unsigned char* man = Pedro.sprite;
-	 int shift = Pedro.posy%8;
-        for(j = 0; j < ((Pedro.height)/8)+1; j++) {
-			if(!(Pedro.posy+Pedro.height > 64 && j < ((64-Pedro.posy)/8))){						//If page is over his bottom position
+    char newsprite = setSprite();
 
-				graphic_write_command(LCD_SET_PAGE | (((63-Pedro.posy-Pedro.height)/8)+j), B_CS1);
-				graphic_write_command(LCD_SET_ADD | Pedro.posx, B_CS1);
-				for(i = 0; i < Pedro.width; i++) {
-					if(j == 0){
-						unsigned char* adress = (man+(j*Pedro.width)+i);
-						unsigned char byte = *adress;
-						byte = byte<<(8-shift);
-						graphic_write_data(byte, B_CS1);
-					}
-					else{
-						unsigned char* adress = (man+((j-1)*Pedro.width)+i);
-						unsigned char byte = *adress;
-						byte = byte>>(shift);
-						if(j < (Pedro.height)/8){
-							unsigned char tillagg = *(adress+Pedro.width);
-							tillagg &= (0xFF>>(8-shift));		//nollställer överblivna bitar som ej ingår i bildförskjutningen
-							tillagg = tillagg<<(8-shift);
-							byte |= tillagg;
-						}
-                        if(j == (Pedro.height)/8){
-                            byte |= backBuffer[64+(Pedro.posx)+i][7-(Pedro.posy)/8];
-                        }
-                            graphic_write_data(byte, B_CS1);
-					}
-				}
-			}
+    
+    unsigned char i, j;
+    unsigned char* man = Pedro.sprite;
+    int shift = Pedro.posy%8;
+    for(j = 0; j < ((Pedro.height)/8)+1; j++) {
+        if(!(Pedro.posy+Pedro.height > 54 && j < ((54-Pedro.posy)/8))){						//If page is over his bottom position
+
+            graphic_write_command(LCD_SET_PAGE | (((63-Pedro.posy-Pedro.height)/8)+j), B_CS1);
+            graphic_write_command(LCD_SET_ADD | Pedro.posx, B_CS1);
+            for(i = 0; i < Pedro.width; i++) {
+                if(j == 0){
+                    unsigned char* adress = (man+(j*Pedro.width)+i);
+                    unsigned char byte = *adress;
+                    byte = byte<<(8-shift);
+                    graphic_write_data(byte, B_CS1);
+                }
+                else{
+                    unsigned char* adress = (man+((j-1)*Pedro.width)+i);
+                    unsigned char byte = *adress;
+                    byte = byte>>(shift);
+                    if(j < (Pedro.height)/8){
+                        unsigned char tillagg = *(adress+Pedro.width);
+                        tillagg &= (0xFF>>(8-shift));		//nollställer överblivna bitar som ej ingår i bildförskjutningen
+                        tillagg = tillagg<<(8-shift);
+                        byte |= tillagg;
+                    }
+                    if(j == (Pedro.height)/8){
+                        byte |= backBuffer[64+(Pedro.posx)+i][7-(Pedro.posy)/8];
+                    }
+                        graphic_write_data(byte, B_CS1);
+                }
+            }
         }
+    }
 }
 
 void oldDraw ()
@@ -273,7 +298,7 @@ int getDistance(){
     return Pedro.distance;
 }
 int getVelx(){
-    return Pedro.velx;
+    return (int)Pedro.velx;
 }
 /*
 int objtouchesborder(POBJECT o){
