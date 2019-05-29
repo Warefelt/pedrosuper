@@ -122,7 +122,32 @@ char isJumping(){
 }
 
 
+#define distanceBetweenAnimationChange 4
+char facingLeft = 0;
+void setSprite(POBJECT Pedro){
+	if(Pedro->velx > 0){
+		facingLeft = 0;
+	}
+	if(Pedro->velx < 0){
+		facingLeft = 1;
+	}
+	if(Pedro->posy > 0){
+		Pedro->sprite = pedro_jump;
+	}
+	else if(Pedro->velx == 0){
+		Pedro->sprite = pedro_still;
+	}
+	else if((getDistance()/distanceBetweenAnimationChange)%2){
+		Pedro->sprite = pedro_walk2;
+	}
+	else{
+		Pedro->sprite = pedro_walk1;
+	}
+}
+
 void draw(POBJECT object){
+	setSprite(object);
+	
 	 unsigned char i, j;
 	 unsigned char* man = object->sprite;
 	 int shift = object->posy%8;
@@ -132,13 +157,25 @@ void draw(POBJECT object){
 				graphic_write_command(LCD_SET_ADD | object->posx, B_CS1);
 				for(i = 0; i < object->width; i++) {
 					if(j == 0){
-						unsigned char* adress = (man+(j*object->width)+i);
+						unsigned char* adress;
+						if(facingLeft){
+							adress = (man+((19-j)*object->width)+i);
+						}
+						else{
+							adress = (man+(j*object->width)+i);
+						}
 						unsigned char byte = *adress;
 						byte = byte<<(8-shift);
 						graphic_write_data(byte, B_CS1);
 					}
-					else{
-						unsigned char* adress = (man+((j-1)*object->width)+i);
+					else{					//Not above head
+						unsigned char* adress;
+						if(facingLeft){
+							adress = (man+((19-(j-1))*object->width)+i);
+						}
+						else{
+							adress = (man+((j-1)*object->width)+i);
+						}
 						unsigned char byte = *adress;
 						byte = byte>>(shift);
 						if(j < (object->height)/8){
@@ -154,6 +191,7 @@ void draw(POBJECT object){
 			}
         }
 }
+
 
 char touchesPepper(){
     //kolla nedre hörnen (om Pedro bredare än 16px även i mitten) först, om pixeln är 1 -> Pedro.touches = 1 innan
